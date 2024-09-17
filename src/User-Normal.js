@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
 import Header from "./Component/Navbar";
+import { useNavigate } from "react-router-dom";
 
 const NormalLogin = () => {
   const [step, setStep] = useState(1);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     dob: "",
@@ -61,15 +63,48 @@ const NormalLogin = () => {
     if (step < 4) {
       setStep(step + 1);
     } else {
+      let filteredFormData = { ...formData };
+  
+    // Remove payment-specific fields based on the selected payment method
+    if (formData.paymentMethod === 'credit-card' || formData.paymentMethod === 'debit-card') {
+      delete filteredFormData.paypalId;
+      delete filteredFormData.bankAccount;
+      delete filteredFormData.ifscCode;
+      delete filteredFormData.upiId;
+    } else if (formData.paymentMethod === 'paypal') {
+      delete filteredFormData.cardNumber;
+      delete filteredFormData.expiryDate;
+      delete filteredFormData.cvv;
+      delete filteredFormData.bankAccount;
+      delete filteredFormData.ifscCode;
+      delete filteredFormData.upiId;
+    } else if (formData.paymentMethod === 'net-banking') {
+      delete filteredFormData.cardNumber;
+      delete filteredFormData.expiryDate;
+      delete filteredFormData.cvv;
+      delete filteredFormData.paypalId;
+      delete filteredFormData.upiId;
+    } else if (formData.paymentMethod === 'upi') {
+      delete filteredFormData.cardNumber;
+      delete filteredFormData.expiryDate;
+      delete filteredFormData.cvv;
+      delete filteredFormData.paypalId;
+      delete filteredFormData.bankAccount;
+      delete filteredFormData.ifscCode;
+    }
+  
       try {
         const response = await axios.post("http://localhost:5000/users/add/patient", formData);
         console.log("Form Data Submitted: ", response.data);
         alert("Appointment Successfully Submitted!");
+        navigate("/");
       } catch (error) {
         console.error("Error submitting form data:", error);
       }
     }
   };
+
+  
 
   const handlePrev = () => {
     if (step > 1) {
@@ -314,7 +349,6 @@ const NormalLogin = () => {
                       name="cardNumber"
                       value={formData.cardNumber}
                       onChange={handlePaymentChange}
-                      required
                       className="form-input"
                     />
 
@@ -326,7 +360,6 @@ const NormalLogin = () => {
                       value={formData.expiryDate}
                       onChange={handlePaymentChange}
                       placeholder="MM/YY"
-                      required
                       className="form-input"
                     />
 
@@ -337,7 +370,6 @@ const NormalLogin = () => {
                       name="cvv"
                       value={formData.cvv}
                       onChange={handlePaymentChange}
-                      required
                       className="form-input"
                     />
                   </div>
@@ -353,7 +385,6 @@ const NormalLogin = () => {
                       value={formData.paypalId}
                       onChange={handlePaymentChange}
                       placeholder="example@paypal.com"
-                      required
                       className="form-input"
                     />
                   </div>
@@ -368,7 +399,6 @@ const NormalLogin = () => {
                       name="bankAccount"
                       value={formData.bankAccount}
                       onChange={handlePaymentChange}
-                      required
                       className="form-input"
                     />
 
@@ -379,7 +409,6 @@ const NormalLogin = () => {
                       name="ifscCode"
                       value={formData.ifscCode}
                       onChange={handlePaymentChange}
-                      required
                       className="form-input"
                     />
                   </div>
@@ -395,7 +424,6 @@ const NormalLogin = () => {
                       value={formData.upiId}
                       onChange={handlePaymentChange}
                       placeholder="example@upi"
-                      required
                       className="form-input"
                     />
                     <div className="qr-code">

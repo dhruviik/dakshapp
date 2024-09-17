@@ -14,7 +14,7 @@ const HOption = () => {
 
       <Container className='mt-5'>
         <div className="user-options-container">
-          <h2>{hospitalName} Hospital Information</h2>
+          <h2>{hospitalName} Information</h2>
 
           <div className="option-section">
             <h4>Normal Case</h4>

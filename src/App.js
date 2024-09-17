@@ -9,6 +9,7 @@ import NormalLogin from './User-Normal';
 import EmergencyLogin from './User-Emergency';
 import HOption from './Hospital-Option';
 import NormalCase from './Hospital-Normal';
+import EmergencyCase from './Hospital-Emergency';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/user/normal" element={<NormalLogin />} />
           <Route path="/hospital/normal" element={<NormalCase />} />
         <Route path="/user/emergency" element={<EmergencyLogin />} />
+        <Route path="/hospital/emergency" element={<EmergencyCase />} />
         </Routes>
       </div>
     </Router>

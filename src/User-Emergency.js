@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
 import Header from "./Component/Navbar";
+import { useNavigate } from "react-router-dom";
 
 const EmergencyLogin = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         category: "",
         name: "",
@@ -23,9 +25,10 @@ const EmergencyLogin = () => {
 
 
         try {
-            const response = await axios.post("https://api.example.com/submit", formData);
+            const response = await axios.post("http://localhost:5000/users/add/emergency", formData);
             console.log("Form Data Submitted: ", response.data);
             alert("Form Submitted Successfully!");
+            navigate("/");
         } catch (error) {
             console.error("Error submitting form data:", error);
         }
@@ -63,7 +66,6 @@ const EmergencyLogin = () => {
                                 value={formData.name}
                                 onChange={handleChange}
                                 placeholder="Enter Name"
-                                required
                                 className="form-input"
                             />
 

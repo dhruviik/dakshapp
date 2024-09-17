@@ -39,7 +39,7 @@ const Hospital = () => {
   
       try {
           // Call the API to create data in the database
-          const response = await axios.post('http://localhost:5000/user/create', {
+          const response = await axios.post('http://localhost:5000/users/add/hospital', {
               name: formData.name,
               email: formData.email,
               password: formData.password,
