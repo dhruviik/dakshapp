@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Header from "./Component/Navbar";
 import { useNavigate } from "react-router-dom";
 
 const NormalLogin = () => {
   const [step, setStep] = useState(1);
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     dob: "",
@@ -30,6 +29,24 @@ const NormalLogin = () => {
     upiId: "",
   });
 
+  const [hospitals, setHospitals] = useState([]); // state to store hospital data
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Fetch hospital data on component mount
+    const fetchHospitals = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/users/get/hospital"); // API call to get hospital data
+        console.log("Hospital Data:", response.data.data); // Log to check the data structure
+        setHospitals(response.data.data); // Assuming response.data is an array of hospitals
+      } catch (error) {
+        console.error("Error fetching hospital data:", error);
+      }
+    };
+
+    fetchHospitals();
+  }, []);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -43,7 +60,7 @@ const NormalLogin = () => {
       ...formData,
       [name]: value,
     });
-    if (name === 'paymentMethod') {
+    if (name === "paymentMethod") {
       const paymentDetails = {
         cardNumber: "",
         expiryDate: "",
@@ -64,37 +81,43 @@ const NormalLogin = () => {
       setStep(step + 1);
     } else {
       let filteredFormData = { ...formData };
-  
-    // Remove payment-specific fields based on the selected payment method
-    if (formData.paymentMethod === 'credit-card' || formData.paymentMethod === 'debit-card') {
-      delete filteredFormData.paypalId;
-      delete filteredFormData.bankAccount;
-      delete filteredFormData.ifscCode;
-      delete filteredFormData.upiId;
-    } else if (formData.paymentMethod === 'paypal') {
-      delete filteredFormData.cardNumber;
-      delete filteredFormData.expiryDate;
-      delete filteredFormData.cvv;
-      delete filteredFormData.bankAccount;
-      delete filteredFormData.ifscCode;
-      delete filteredFormData.upiId;
-    } else if (formData.paymentMethod === 'net-banking') {
-      delete filteredFormData.cardNumber;
-      delete filteredFormData.expiryDate;
-      delete filteredFormData.cvv;
-      delete filteredFormData.paypalId;
-      delete filteredFormData.upiId;
-    } else if (formData.paymentMethod === 'upi') {
-      delete filteredFormData.cardNumber;
-      delete filteredFormData.expiryDate;
-      delete filteredFormData.cvv;
-      delete filteredFormData.paypalId;
-      delete filteredFormData.bankAccount;
-      delete filteredFormData.ifscCode;
-    }
-  
+
+      // Remove payment-specific fields based on the selected payment method
+      if (
+        formData.paymentMethod === "credit-card" ||
+        formData.paymentMethod === "debit-card"
+      ) {
+        delete filteredFormData.paypalId;
+        delete filteredFormData.bankAccount;
+        delete filteredFormData.ifscCode;
+        delete filteredFormData.upiId;
+      } else if (formData.paymentMethod === "paypal") {
+        delete filteredFormData.cardNumber;
+        delete filteredFormData.expiryDate;
+        delete filteredFormData.cvv;
+        delete filteredFormData.bankAccount;
+        delete filteredFormData.ifscCode;
+        delete filteredFormData.upiId;
+      } else if (formData.paymentMethod === "net-banking") {
+        delete filteredFormData.cardNumber;
+        delete filteredFormData.expiryDate;
+        delete filteredFormData.cvv;
+        delete filteredFormData.paypalId;
+        delete filteredFormData.upiId;
+      } else if (formData.paymentMethod === "upi") {
+        delete filteredFormData.cardNumber;
+        delete filteredFormData.expiryDate;
+        delete filteredFormData.cvv;
+        delete filteredFormData.paypalId;
+        delete filteredFormData.bankAccount;
+        delete filteredFormData.ifscCode;
+      }
+
       try {
-        const response = await axios.post("http://localhost:5000/users/add/patient", formData);
+        const response = await axios.post(
+          "http://localhost:5000/users/add/patient",
+          filteredFormData
+        );
         console.log("Form Data Submitted: ", response.data);
         alert("Appointment Successfully Submitted!");
         navigate("/");
@@ -103,8 +126,6 @@ const NormalLogin = () => {
       }
     }
   };
-
-  
 
   const handlePrev = () => {
     if (step > 1) {
@@ -121,7 +142,6 @@ const NormalLogin = () => {
           {step === 1 && (
             <div className="form-step d-flex flex-column">
               <h3>Patient Details</h3>
-
               <label htmlFor="name">Name</label>
               <input
                 type="text"
@@ -263,13 +283,16 @@ const NormalLogin = () => {
                 className="form-input"
               >
                 <option value="">Select Hospital</option>
-                <option value="Zydus Hospital">Zydus Hospital</option>
-                <option value="Iris Hospital">Iris Hospital</option>
-                <option value="Anand City Hospital">Anand City Hospital</option>
-                <option value="Deep Hospital">Deep Hospital</option>
-                <option value="Swastik Hospital">Swastik Hospital</option>
-                <option value="Krishna Hospital">Krishna Hospital</option>
-                <option value="Shashwat Hospital">Shashwat Hospital</option>
+                {/* Display hospital names in dropdown */}
+                {hospitals.length > 0 ? (
+                  hospitals.map((hospital, index) => (
+                    <option key={index} value={hospital.name}>
+                      {hospital.name}
+                    </option>
+                  ))
+                ) : (
+                  <option value="">No Hospitals Available</option>
+                )}
               </select>
               <div className="form-navigation d-flex gap-3">
                 <button type="button" onClick={handlePrev} className="form-button prev-button">
@@ -293,9 +316,12 @@ const NormalLogin = () => {
                 className="form-input"
               >
                 <option value="">Select Doctor</option>
-                <option value="Dr. A">Dr. A</option>
-                <option value="Dr. B">Dr. B</option>
-                <option value="Dr. C">Dr. C</option>
+                <option value="Dr Rakesh Mahajan">Dr Rakesh Mahajan</option>
+                <option value="Dr Puneet Girdhar">Dr Puneet Girdhar</option>
+                <option value="Dr Surender Kumar Dabas">Dr Surender Kumar Dabas</option>
+                <option value="Dr (Prof) Sanjay Tyagi">Dr (Prof) Sanjay Tyagi</option>
+                <option value="Dr Sudhir Tyagi">Dr Sudhir Tyagi</option>
+                <option value="Dr Sapna Nangia">Dr Sapna Nangia</option>
               </select>
               <div className="form-navigation d-flex gap-3">
                 <button type="button" onClick={handlePrev} className="form-button prev-button">

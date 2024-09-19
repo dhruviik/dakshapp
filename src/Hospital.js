@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 import Header from './Component/Navbar';
 import { Container } from 'react-bootstrap';
 
@@ -118,7 +118,7 @@ const Hospital = () => {
                     </form>
 
                     <div className="footer-group">
-                        <span>Already Registered? <a href="/">Sign In</a></span>
+                        <span>Already Registered? <Link to={"/hospital/login"}>Sign In</Link></span>
                         <a href="/">Forgot password?</a>
                     </div>
                 </div>
